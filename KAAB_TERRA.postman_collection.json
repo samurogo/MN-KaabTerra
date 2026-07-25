@@ -1,89 +1,98 @@
 {
-  "info": {
-    "_postman_id": "07b7d2e9-dfae-4fba-88c7-715b5f35dd5f",
-    "name": "KAAB_TERRA",
-    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "56225939",
-    "_collection_link": "https://go.postman.co/collection/56225939-07b7d2e9-dfae-4fba-88c7-715b5f35dd5f?source=collection_link"
-  },
-  "item": [
-    {
-      "name": "http://127.0.0.1:8000/api/analytics/predict",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Successful POST request\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-              "});",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"altitud\": 1450.0,\n  \"humedad\": 62.5,\n  \"temperatura\": 18.5,\n  \"rendimiento\": 11.2\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://127.0.0.1:8000/api/analytics/predict",
-          "protocol": "http",
-          "host": [
-            "127",
-            "0",
-            "0",
-            "1"
-          ],
-          "port": "8000",
-          "path": [
-            "api",
-            "analytics",
-            "predict"
-          ]
-        },
-        "description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
-      },
-      "response": []
-    },
-    {
-      "name": "http://127.0.0.1:8000/api/analytics/history",
-      "request": {
-        "auth": {
-          "type": "noauth"
-        },
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "http://127.0.0.1:8000/api/analytics/history",
-          "protocol": "http",
-          "host": [
-            "127",
-            "0",
-            "0",
-            "1"
-          ],
-          "port": "8000",
-          "path": [
-            "api",
-            "analytics",
-            "history"
-          ]
-        }
-      },
-      "response": []
-    }
-  ]
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "KAAB TERRA API",
+		"description": "Colección de peticiones para probar los endpoints de la API de Kaab Terra.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Root Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": [""]
+				}
+			}
+		},
+		{
+			"name": "Clasificar Lote (Clustering ML)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"altitud\": 1450.0,\n  \"humedad\": 64.0,\n  \"temperatura\": 18.5,\n  \"rendimiento\": 12.0,\n  \"costo_kilo\": 3.2,\n  \"puntaje_sca\": 84.5\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/v1/analytics/clasificar-lote",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "v1", "analytics", "clasificar-lote"]
+				}
+			}
+		},
+		{
+			"name": "Evaluar Estado de Salud (Clasificador ML)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"humedad_suelo\": 20.0,\n  \"temperatura_suelo\": 32.5,\n  \"severidad_plaga\": 2,\n  \"severidad_enfermedad\": 1,\n  \"dias_ultima_fertilizacion\": 180,\n  \"dias_ultima_poda\": 210,\n  \"rendimiento_actual\": 6.0\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/v1/analytics/evaluar-estado",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "v1", "analytics", "evaluar-estado"]
+				}
+			}
+		},
+		{
+			"name": "Estimar Producción / Cosecha (Regresión ML)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{"key": "Content-Type", "value": "application/json"}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"rendimiento_historico_q_ha\": 11.5,\n  \"area_hectareas\": 2.0,\n  \"edad_cultivo_anios\": 6,\n  \"densidad_plantas_ha\": 4000,\n  \"humedad_promedio\": 64.0,\n  \"temperatura_promedio\": 19.0,\n  \"fertilizaciones_realizadas_anio\": 3\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/v1/analytics/estimar-produccion",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "v1", "analytics", "estimar-produccion"]
+				}
+			}
+		},
+		{
+			"name": "Obtener Pasaporte JSON",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/v1/pasaporte/LOT-2026-CHIS-001",
+					"protocol": "http",
+					"host": ["127", "0", "0", "1"],
+					"port": "8000",
+					"path": ["api", "v1", "pasaporte", "LOT-2026-CHIS-001"]
+				}
+			}
+		}
+	]
 }

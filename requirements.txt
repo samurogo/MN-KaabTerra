@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+joblib
+qrcode
+pillow
+pydantic
+matplotlib
+seaborn
