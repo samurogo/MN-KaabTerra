@@ -2,14 +2,22 @@ import os
 import joblib
 import pandas as pd
 from fastapi import APIRouter, HTTPException
-from app.models import LoteInput, EstadoLoteInput, EstimacionProduccionInput
+from app.models import (
+    LoteInput, 
+    EstadoLoteInput, 
+    EstimacionProduccionInput, 
+    AnomaliaCostosInput
+)
 
 router = APIRouter(prefix="/api/v1/analytics", tags=["Analítica y ML"])
 
-# Rutas a los modelos binarios guardados
+# -------------------------------------------------------------
+# RUTAS A LOS MODELOS BINARIOS GUARDADOS
+# -------------------------------------------------------------
 KMEANS_PATH = os.path.join("models_saved", "pipeline_kaab_terra_clustering.joblib")
 CLASIFICADOR_PATH = os.path.join("models_saved", "pipeline_clasificador_estado.joblib")
 REGRESION_PATH = os.path.join("models_saved", "pipeline_regresion_produccion.joblib")
+ANOMALIAS_PATH = os.path.join("models_saved", "model_isolation_forest.joblib")
 
 # Carga dinámica de K-Means
 try:
@@ -29,6 +37,16 @@ try:
 except Exception:
     regresion_pipeline = None
 
+# Carga dinámica de Isolation Forest (Anomalías)
+try:
+    anomalias_model = joblib.load(ANOMALIAS_PATH)
+except Exception:
+    anomalias_model = None
+
+
+# -------------------------------------------------------------
+# DICCIONARIOS DE INTERPRETABILIDAD Y DIAGNÓSTICO
+# -------------------------------------------------------------
 PERFILES_KMEANS = {
     0: {
         "categoria": "Café Especial / Premium",
@@ -77,7 +95,7 @@ def clasificar_lote(lote: LoteInput):
     if not kmeans_pipeline:
         raise HTTPException(
             status_code=500,
-            detail="El modelo K-Means no está cargado."
+            detail="El modelo K-Means no está cargado. Asegúrate de haber ejecutado su notebook."
         )
 
     input_df = pd.DataFrame([lote.model_dump()])
@@ -143,5 +161,45 @@ def estimar_produccion_cosecha(datos_lote: EstimacionProduccionInput):
             "produccion_total_estimada_quintales": produccion_total_quintales,
             "unidad": "Quintales (q = 100 lb / 46 kg aprox)",
             "nota": "Estimación basada en el historial del lote, curva de edad del cultivo e insumos aplicados."
+        }
+    }
+
+
+# -------------------------------------------------------------
+# ENDPOINT 4: DETECCIÓN DE ANOMALÍAS (Isolation Forest)
+# -------------------------------------------------------------
+@router.post("/detectar-anomalias-costos")
+def detectar_anomalias_costos(datos_costos: AnomaliaCostosInput):
+    if not anomalias_model:
+        raise HTTPException(
+            status_code=500,
+            detail="El modelo Isolation Forest no está cargado. Ejecuta 'entrenamiento_anomalias_isolation_forest.ipynb'."
+        )
+
+    input_df = pd.DataFrame([datos_costos.model_dump()])
+    
+    # IsolationForest devuelve -1 para datos anómalos y 1 para normales
+    prediccion = int(anomalias_model.predict(input_df)[0])
+    es_anomalo = (prediccion == -1)
+
+    diagnostico = (
+        "⚠️ ALERTA: Se detectó una variación atípica e inusual en los costos/rendimiento de este lote." 
+        if es_anomalo 
+        else "🟢 Comportamiento dentro de los parámetros esperados de costo y rendimiento."
+    )
+
+    accion = (
+        "Revisar posibles sobrecostos en mano de obra o fuga de insumos frente al rendimiento reportado."
+        if es_anomalo
+        else "Mantener la gestión de costos sin ajustes urgentes."
+    )
+
+    return {
+        "datos_evaluados": datos_costos.model_dump(),
+        "resultado_analisis": {
+            "es_anomalo": es_anomalo,
+            "diagnostico": diagnostico,
+            "accion_sugerida": accion,
+            "algoritmo": "Isolation Forest (Detección No Supervisada de Anomalías)"
         }
     }

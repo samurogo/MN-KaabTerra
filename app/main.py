@@ -1,19 +1,26 @@
 from fastapi import FastAPI
-from app.routes import analytics, pasaporte
+from app.routes import analytics, pasaporte, nlp
 
 app = FastAPI(
-    title="Kaab Terra Analytics API",
-    description="API de minería de datos, clustering y trazabilidad para la cadena de valor del café.",
+    title="Kaab Terra API",
+    description="Plataforma digital para la gestión, analítica predictiva y trazabilidad del café.",
     version="2.0.0"
 )
 
+# Incluir Routers
 app.include_router(analytics.router)
 app.include_router(pasaporte.router)
-
+app.include_router(nlp.router)
 
 @app.get("/")
-def root():
+def read_root():
     return {
-        "mensaje": "Bienvenido a la API de Kaab Terra",
-        "documentacion": "/docs"
+        "sistema": "Kaab Terra API",
+        "version": "2.0.0",
+        "estado": "Operativo",
+        "modulos": [
+            "Analítica y ML (Clustering, Clasificación, Regresión, Isolation Forest)",
+            "Trazabilidad (Pasaporte Digital QR)",
+            "Procesamiento de Lenguaje Natural (spaCy / RAG Asistente)"
+        ]
     }

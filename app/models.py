@@ -40,7 +40,26 @@ class EstimacionProduccionInput(BaseModel):
 
 
 # ==========================================
-# 4. PASAPORTE DIGITAL
+# 4. MODELO ISOLATION FOREST (Detección de Anomalías)
+# ==========================================
+class AnomaliaCostosInput(BaseModel):
+    costo_mano_obra_ha: float = Field(..., example=1200.0, description="Gasto en mano de obra por hectárea en USD")
+    costo_insumos_ha: float = Field(..., example=850.0, description="Gasto en insumos y fertilizantes por hectárea en USD")
+    rendimiento_q_ha: float = Field(..., example=12.5, description="Rendimiento obtenido quintales/ha")
+
+
+# ==========================================
+# 5. MODELOS DE PLN Y ASISTENTE TÉCNICO (spaCy / RAG)
+# ==========================================
+class ObservacionCampoInput(BaseModel):
+    texto_observacion: str = Field(..., example="Se detectó una plaga de roya severa en el lote 3 tras las lluvias intensas de la semana pasada.")
+
+class ConsultaAsistenteInput(BaseModel):
+    pregunta: str = Field(..., example="¿Cómo debo controlar la roya en mi cafetal si la humedad es alta?")
+
+
+# ==========================================
+# 6. PASAPORTE DIGITAL
 # ==========================================
 class ProductorInfo(BaseModel):
     nombre: str
